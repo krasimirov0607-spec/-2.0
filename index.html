@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+                    <!DOCTYPE html>
 <html lang="bg">
 <head>
     <meta charset="UTF-8">
@@ -127,8 +127,8 @@
             projects.push({ name, status: 'planned', prices: DEFAULT_OPS.map(op => ({ n: op, p: "" })), workers: [], days: [], fuel: 15, lastProfit: 0 });
             saveToStorage(); 
             renderProjectList();
-            inputField.value = ''; // Изчиства полето за следващия път
-            openProject(projects.length - 1); // Отваря го веднага
+            inputField.value = ''; 
+            openProject(projects.length - 1); 
         }
 
         function openProject(index) {
@@ -223,7 +223,7 @@
                 const vInp = r.querySelector('input.v');
                 if(nInp && nInp.value) ops.push({n: nInp.value, p: vInp ? vInp.value : 0});
             });
-            let options = ops.map(o => `<option value="${o.p}" ${selVal == o.p ? 'selected' : ''}>${o.n}</option>`).join('');
+            let options = ops.map(o => `<option value="${o.n}" data-price="${o.p}" ${selVal == o.n ? 'selected' : ''}>${o.n}</option>`).join('');
             row.innerHTML = `<td><select onchange="saveCurrentData()" style="padding: 10px; margin-bottom: 5px;">${options}</select></td><td style="width:80px;"><input type="number" value="${qtyVal}" oninput="saveCurrentData()" style="padding: 10px; margin-bottom: 5px; text-align: center;"></td>`;
             table.appendChild(row);
             saveCurrentData();
@@ -260,7 +260,13 @@
             document.querySelectorAll('#prices-list input.v').forEach(inp => sqTotal += parseFloat(inp.value) || 0);
             document.getElementById('sq-total-display').innerText = sqTotal.toFixed(2);
             document.querySelectorAll('.day-card').forEach(card => {
-                let dIn = 0; card.querySelectorAll('.ops-table tr').forEach(tr => dIn += (parseFloat(tr.querySelector('select').value) || 0) * (parseFloat(tr.querySelector('input').value) || 0));
+                let dIn = 0; 
+                card.querySelectorAll('.ops-table tr').forEach(tr => {
+                    const select = tr.querySelector('select');
+                    const price = select.options[select.selectedIndex] ? parseFloat(select.options[select.selectedIndex].getAttribute('data-price')) || 0 : 0;
+                    const qty = parseFloat(tr.querySelector('input').value) || 0;
+                    dIn += price * qty;
+                });
                 let dEx = (parseFloat(card.querySelector('.day-cars').value) || 0) * fuel + (parseFloat(card.querySelector('.day-other').value) || 0);
                 card.querySelectorAll('.worker-tag.active').forEach(tag => dEx += parseFloat(tag.dataset.wage) || 0);
                 card.querySelector('.d-res').innerText = (dIn - dEx).toFixed(2);
